@@ -137,6 +137,15 @@
 
       .work-card:hover::before { opacity: 0.85; }
       .work-card:hover::after { animation: cardSweep 900ms ease forwards; }
+
+      /* 首頁場景圖霓虹光暈 */
+      .hero-scene-glow {
+        position: absolute;
+        inset: -20px;
+        background: radial-gradient(circle at 50% 50%, rgba(100, 200, 255, 0.2) 0%, transparent 70%);
+        filter: blur(15px);
+        opacity: 0.8;
+      }
     </style>
   </head>
   <body>
@@ -147,6 +156,8 @@
       const EMAIL_ADDRESS = 'nagi0513new@gmail.com';
       const LOGO_IMAGE = 'images/logo.png';
       const MAX_WORKS = 50;
+      // 橫式首頁場景圖路徑
+      const HERO_SCENE_IMAGE = 'images/hero_scene.jpg';
 
       const content = {
         zh: {
@@ -160,8 +171,6 @@
             rules: '規則',
             contact: '聯絡'
           },
-          heroLine1: 'Welcome to ArtEMIS’s',
-          heroLine2: 'Art Commission Portfolio',
           openLine: 'Open for character illustration commissions!',
           ctaPrimary: '立即委託',
           servicesTitle: '服務項目',
@@ -205,8 +214,6 @@
             rules: 'Rules',
             contact: 'Contact'
           },
-          heroLine1: 'Welcome to ArtEMIS’s',
-          heroLine2: 'Art Commission Portfolio',
           openLine: 'Open for character illustration commissions!',
           ctaPrimary: 'Commission',
           servicesTitle: 'Services',
@@ -312,11 +319,9 @@
               <div class="mx-auto max-w-7xl px-6 py-8 lg:px-10">
                 <header class="flex flex-col gap-5 border-b border-cyan-200/10 pb-5 md:flex-row md:items-center md:justify-between">
                   <a href="#home" class="flex items-center">
-                    <div class="rounded-sm border border-cyan-200/30 bg-white/5 p-2 shadow-[0_0_24px_rgba(100,180,255,0.16)] backdrop-blur">
-                      <div class="relative">
-                        <div class="absolute inset-0 rounded-[6px] bg-cyan-300/20 blur-2xl opacity-70 animate-pulse"></div>
-                        <img src="${LOGO_IMAGE}" alt="${t.brand} logo" class="relative h-24 w-auto object-contain md:h-32 lg:h-36 drop-shadow-[0_0_18px_rgba(120,220,255,0.6)]" />
-                      </div>
+                    <div class="relative">
+                      <div class="absolute inset-0 rounded-full bg-cyan-300/15 blur-2xl opacity-60 animate-pulse"></div>
+                      <img src="${LOGO_IMAGE}" alt="${t.brand} logo" class="relative h-24 w-auto object-contain md:h-32 lg:h-36 drop-shadow-[0_0_20px_rgba(120,220,255,0.7)]" />
                     </div>
                   </a>
 
@@ -340,11 +345,14 @@
                   </div>
                 </header>
 
-                <div class="flex min-h-[72vh] flex-col items-center justify-center py-20 text-center lg:min-h-[78vh]">
-                  <div class="max-w-5xl text-5xl font-light leading-tight tracking-tight text-white md:text-7xl lg:text-8xl">
-                    <div>${t.heroLine1}</div>
-                    <div class="bg-gradient-to-r from-cyan-100 via-white to-violet-200 bg-clip-text text-transparent">${t.heroLine2}</div>
+                <div class="flex min-h-[72vh] flex-col items-center justify-center py-10 lg:min-h-[78vh]">
+                  <div class="relative w-full max-w-6xl overflow-hidden rounded-[2.5rem] border border-cyan-200/20 shadow-[0_20px_60px_rgba(0,0,0,0.5)] backdrop-blur-sm bg-black/10">
+                    <div class="hero-scene-glow"></div>
+                    <img src="${HERO_SCENE_IMAGE}" alt="ArtEMIS Core Scene" class="relative h-[400px] w-full object-cover md:h-[500px] lg:h-[550px]" />
+                    
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
                   </div>
+
                   <div class="mt-8 rounded-full border border-cyan-200/25 bg-white/5 px-10 py-4 text-xl text-white/85 shadow-[0_0_18px_rgba(70,170,255,0.08)] backdrop-blur md:text-2xl">${t.openLine}</div>
                   <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
                     <a href="#contact" class="rounded-full border border-cyan-200/30 bg-gradient-to-b from-blue-500/20 to-slate-950/50 px-12 py-4 text-2xl font-medium text-cyan-50 shadow-[0_0_18px_rgba(70,170,255,0.18)] transition hover:-translate-y-0.5">${t.ctaPrimary}</a>
