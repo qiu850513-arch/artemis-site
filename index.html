@@ -1,672 +1,548 @@
-import { useEffect, useMemo, useState } from 'react';
-
-type Lang = 'zh' | 'en';
-
-type PortfolioItem = {
-  category: string;
-  name: string;
-  blurb: string;
-  image: string;
-};
-
-type Plan = {
-  name: string;
-  price: string;
-  items: string[];
-};
-
-type ServiceItem = {
-  title: string;
-  desc: string;
-};
-
-type RuleItem = {
-  title: string;
-  content: string;
-};
-
-type LocalizedContent = {
-  brand: string;
-  brandSub: string;
-  nav: {
-    home: string;
-    services: string;
-    pricing: string;
-    work: string;
-    rules: string;
-    contact: string;
-  };
-  heroLine1: string;
-  heroLine2: string;
-  openLine: string;
-  ctaPrimary: string;
-  servicesTitle: string;
-  services: ServiceItem[];
-  pricingTitle: string;
-  pricingPlans: Plan[];
-  workTitle: string;
-  workDesc: string;
-  rulesTitle: string;
-  rules: RuleItem[];
-  contactTitle: string;
-  contactDesc: string;
-  discordLabel: string;
-  emailLabel: string;
-  discordCopied: string;
-  commissionPanelTitle: string;
-  commissionPanelBody: string;
-  emptyGallery: string;
-};
-
-const DISCORD_ID = 'nagi.0.5.1.3';
-const EMAIL_ADDRESS = 'nagi0513new@gmail.com';
-const LOGO_IMAGE = 'images/logo.png';
-const MAX_WORKS = 50;
-
-function buildWorkItems(lang: Lang): PortfolioItem[] {
-  return Array.from({ length: MAX_WORKS }, (_, i) => {
-    const num = i + 1;
-    return {
-      category: lang === 'zh' ? '角色藝術' : 'Character Art',
-      name: lang === 'zh' ? `作品 ${num}` : `Artwork ${num}`,
-      blurb:
-        lang === 'zh'
-          ? '自動載入的作品展示。'
-          : 'Automatically loaded portfolio artwork.',
-      image: `images/work${num}.jpg`,
-    };
-  });
-}
-
-const content: Record<Lang, LocalizedContent> = {
-  zh: {
-    brand: 'ArtEMIS',
-    brandSub: '米絲藝術',
-    nav: {
-      home: '首頁',
-      services: '服務',
-      pricing: '價目',
-      work: '作品',
-      rules: '規則',
-      contact: '聯絡',
-    },
-    heroLine1: 'Welcome to ArtEMIS’s',
-    heroLine2: 'Art Commission Portfolio',
-    openLine: 'Open for character illustration commissions!',
-    ctaPrimary: '立即委託',
-    servicesTitle: '服務項目',
-    services: [
-      { title: '角色藝術', desc: '日系角色委託與形象插畫。' },
-      { title: 'Itasha 藝術', desc: '痛車與視覺延伸設計。' },
-      { title: '角色設計', desc: '角色設定、服裝與配色提案。' },
-      { title: '全插畫', desc: '完整構圖與場景敘事插畫。' },
-    ],
-    pricingTitle: '價目表',
-    pricingPlans: [
-      { name: '基本', price: 'NT$3,000', items: ['角色', '簡背景'] },
-      { name: '進階', price: 'NT$6,000', items: ['完整立繪', '細節光影'] },
-      { name: '商用', price: '另議', items: ['授權', '用途報價'] },
-    ],
-    workTitle: '作品展示',
-    workDesc: '點擊作品可放大檢視細節。',
-    rulesTitle: '委託規則',
-    rules: [
-      { title: '付款', content: '確認後需先支付訂金。' },
-      { title: '修改', content: '草稿可調整，完稿大改需加價。' },
-      { title: '商用', content: '商用授權需另行報價。' },
-    ],
-    contactTitle: '聯絡方式',
-    contactDesc: '可直接複製 Discord 或透過 Email 聯絡。',
-    discordLabel: 'Discord',
-    emailLabel: 'Email',
-    discordCopied: 'Discord ID 已複製',
-    commissionPanelTitle: '委託通道',
-    commissionPanelBody: 'Discord 是最快的聯絡方式，適合詢價、排程與專案討論。',
-    emptyGallery: '目前尚未找到作品圖片。請將圖片命名為 work1.jpg、work2.jpg... 並放進 images 資料夾。',
-  },
-  en: {
-    brand: 'ArtEMIS',
-    brandSub: 'Misi Art',
-    nav: {
-      home: 'Home',
-      services: 'Services',
-      pricing: 'Pricing',
-      work: 'Portfolio',
-      rules: 'Rules',
-      contact: 'Contact',
-    },
-    heroLine1: 'Welcome to ArtEMIS’s',
-    heroLine2: 'Art Commission Portfolio',
-    openLine: 'Open for character illustration commissions!',
-    ctaPrimary: 'Commission',
-    servicesTitle: 'Services',
-    services: [
-      { title: 'Character Art', desc: 'Anime-style commission work.' },
-      { title: 'Itasha Art', desc: 'Vehicle wrap visual design.' },
-      { title: 'Character Design', desc: 'Outfit, palette, and concept direction.' },
-      { title: 'Full Illustration', desc: 'Scene composition and polished rendering.' },
-    ],
-    pricingTitle: 'Pricing',
-    pricingPlans: [
-      { name: 'Basic', price: '$100', items: ['Character', 'Simple background'] },
-      { name: 'Advanced', price: '$200', items: ['Full-body', 'Lighting detail'] },
-      { name: 'Commercial', price: 'Custom', items: ['License', 'Usage-based quote'] },
-    ],
-    workTitle: 'Portfolio',
-    workDesc: 'Click any work to enlarge.',
-    rulesTitle: 'Rules',
-    rules: [
-      { title: 'Payment', content: 'Deposit required after confirmation.' },
-      { title: 'Revisions', content: 'Sketch revisions are allowed. Major final changes cost extra.' },
-      { title: 'Commercial Use', content: 'Commercial licensing is quoted separately.' },
-    ],
-    contactTitle: 'Contact',
-    contactDesc: 'Copy the Discord ID or contact via email.',
-    discordLabel: 'Discord',
-    emailLabel: 'Email',
-    discordCopied: 'Discord ID copied',
-    commissionPanelTitle: 'Commission Channel',
-    commissionPanelBody:
-      'Discord is the fastest way to reach me for commission inquiries, scheduling, and project discussion.',
-    emptyGallery:
-      'No portfolio images found yet. Add files like work1.jpg, work2.jpg... into the images folder.',
-  },
-};
-
-export default function App() {
-  const [lang, setLang] = useState<Lang>('zh');
-  const [gallery, setGallery] = useState<PortfolioItem[]>([]);
-  const [selected, setSelected] = useState<PortfolioItem | null>(null);
-  const [pointer, setPointer] = useState({ x: 0, y: 0 });
-  const [currentSlide, setCurrentSlide] = useState(0);
-
-  const t = useMemo(() => content[lang], [lang]);
-
-  useEffect(() => {
-    const handleMove = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 24;
-      const y = (e.clientY / window.innerHeight - 0.5) * 24;
-      setPointer({ x, y });
-    };
-
-    window.addEventListener('mousemove', handleMove);
-    return () => window.removeEventListener('mousemove', handleMove);
-  }, []);
-
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setSelected(null);
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ArtEMIS / 米絲藝術</title>
+    <meta
+      name="description"
+      content="ArtEMIS 米絲藝術｜角色藝術、Itasha 藝術、角色設計與全插畫委託作品集。支援中文與 English 切換。"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background: #02040b;
+        color: white;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
-    };
 
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, []);
+      @keyframes floatSlow {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+        100% { transform: translateY(0px); }
+      }
+      @keyframes drift {
+        0% { transform: translateX(0px); }
+        50% { transform: translateX(30px); }
+        100% { transform: translateX(0px); }
+      }
+      @keyframes sparkle {
+        0%, 100% { opacity: 0.2; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.6); }
+      }
+      @keyframes beamMove {
+        0% { transform: translateX(-10%) rotate(0deg); opacity: 0.2; }
+        50% { transform: translateX(10%) rotate(1deg); opacity: 0.6; }
+        100% { transform: translateX(-10%) rotate(0deg); opacity: 0.2; }
+      }
+      @keyframes gridPulse {
+        0%, 100% { opacity: 0.15; }
+        50% { opacity: 0.35; }
+      }
+      @keyframes scanlineMove {
+        0% { transform: translateY(-100%); }
+        100% { transform: translateY(100%); }
+      }
+      @keyframes cardSweep {
+        0% { transform: translateX(-140%) skewX(-18deg); opacity: 0; }
+        20% { opacity: 0; }
+        45% { opacity: 0.55; }
+        100% { transform: translateX(180%) skewX(-18deg); opacity: 0; }
+      }
+      @keyframes cardPulse {
+        0%, 100% { box-shadow: 0 18px 48px rgba(0,0,0,0.34), 0 0 0 rgba(90,170,255,0); }
+        50% { box-shadow: 0 18px 48px rgba(0,0,0,0.4), 0 0 28px rgba(90,170,255,0.12); }
+      }
 
-  useEffect(() => {
-    let isCancelled = false;
-    const candidates = buildWorkItems(lang);
+      .bg-float { animation: floatSlow 12s ease-in-out infinite; }
+      .bg-drift { animation: drift 18s ease-in-out infinite; }
+      .beam {
+        position: absolute;
+        width: 120%;
+        height: 200px;
+        background: linear-gradient(90deg, transparent, rgba(120,180,255,0.2), transparent);
+        filter: blur(25px);
+        animation: beamMove 18s ease-in-out infinite;
+      }
+      .sparkle {
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        background: rgba(180,220,255,0.9);
+        border-radius: 999px;
+        box-shadow: 0 0 10px rgba(120,180,255,0.8);
+        animation: sparkle 4s infinite ease-in-out;
+      }
+      .grid-animate { animation: gridPulse 6s ease-in-out infinite; }
+      .scanline {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent, rgba(120,180,255,0.08), transparent);
+        animation: scanlineMove 6s linear infinite;
+        pointer-events: none;
+      }
+      .work-card {
+        position: relative;
+        animation: cardPulse 6s ease-in-out infinite;
+      }
+      .work-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 2rem;
+        padding: 1px;
+        background: linear-gradient(135deg, rgba(120,190,255,0.45), rgba(130,110,255,0.15), rgba(120,190,255,0.08));
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0.45;
+        pointer-events: none;
+        transition: opacity 240ms ease;
+      }
+      .work-card::after {
+        content: '';
+        position: absolute;
+        top: -20%;
+        bottom: -20%;
+        width: 28%;
+        background: linear-gradient(90deg, transparent, rgba(160,220,255,0.1), rgba(255,255,255,0.32), rgba(160,220,255,0.1), transparent);
+        filter: blur(10px);
+        transform: translateX(-140%) skewX(-18deg);
+        opacity: 0;
+        pointer-events: none;
+      }
+      .work-card:hover::before { opacity: 0.85; }
+      .work-card:hover::after { animation: cardSweep 900ms ease forwards; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
 
-    Promise.all(
-      candidates.map(
-        (item) =>
-          new Promise<PortfolioItem | null>((resolve) => {
-            const img = new Image();
-            img.onload = () => resolve(item);
-            img.onerror = () => resolve(null);
-            img.src = item.image;
+    <script>
+      const DISCORD_ID = 'nagi.0.5.1.3';
+      const EMAIL_ADDRESS = 'nagi0513new@gmail.com';
+      const LOGO_IMAGE = 'images/logo.png';
+      const MAX_WORKS = 50;
+
+      const content = {
+        zh: {
+          brand: 'ArtEMIS',
+          brandSub: '米絲藝術',
+          nav: { home: '首頁', services: '服務', pricing: '價目', work: '作品', rules: '規則', contact: '聯絡' },
+          heroLine1: 'Welcome to ArtEMIS’s',
+          heroLine2: 'Art Commission Portfolio',
+          openLine: 'Open for character illustration commissions!',
+          ctaPrimary: '立即委託',
+          servicesTitle: '服務項目',
+          services: [
+            { title: '角色藝術', desc: '日系角色委託與形象插畫。' },
+            { title: 'Itasha 藝術', desc: '痛車與視覺延伸設計。' },
+            { title: '角色設計', desc: '角色設定、服裝與配色提案。' },
+            { title: '全插畫', desc: '完整構圖與場景敘事插畫。' }
+          ],
+          pricingTitle: '價目表',
+          pricingPlans: [
+            { name: '基本', price: 'NT$3,000', items: ['角色', '簡背景'] },
+            { name: '進階', price: 'NT$6,000', items: ['完整立繪', '細節光影'] },
+            { name: '商用', price: '另議', items: ['授權', '用途報價'] }
+          ],
+          workTitle: '作品展示',
+          workDesc: '點擊作品可放大檢視細節。',
+          rulesTitle: '委託規則',
+          rules: [
+            { title: '付款', content: '確認後需先支付訂金。' },
+            { title: '修改', content: '草稿可調整，完稿大改需加價。' },
+            { title: '商用', content: '商用授權需另行報價。' }
+          ],
+          contactTitle: '聯絡方式',
+          contactDesc: '可直接複製 Discord 或透過 Email 聯絡。',
+          discordLabel: 'Discord',
+          emailLabel: 'Email',
+          discordCopied: 'Discord ID 已複製',
+          commissionPanelTitle: '委託通道',
+          commissionPanelBody: 'Discord 是最快的聯絡方式，適合詢價、排程與專案討論。',
+          emptyGallery: '目前尚未找到作品圖片。請將圖片命名為 work1.jpg、work2.jpg... 並放進 images 資料夾。'
+        },
+        en: {
+          brand: 'ArtEMIS',
+          brandSub: 'Misi Art',
+          nav: { home: 'Home', services: 'Services', pricing: 'Pricing', work: 'Portfolio', rules: 'Rules', contact: 'Contact' },
+          heroLine1: 'Welcome to ArtEMIS’s',
+          heroLine2: 'Art Commission Portfolio',
+          openLine: 'Open for character illustration commissions!',
+          ctaPrimary: 'Commission',
+          servicesTitle: 'Services',
+          services: [
+            { title: 'Character Art', desc: 'Anime-style commission work.' },
+            { title: 'Itasha Art', desc: 'Vehicle wrap visual design.' },
+            { title: 'Character Design', desc: 'Outfit, palette, and concept direction.' },
+            { title: 'Full Illustration', desc: 'Scene composition and polished rendering.' }
+          ],
+          pricingTitle: 'Pricing',
+          pricingPlans: [
+            { name: 'Basic', price: '$100', items: ['Character', 'Simple background'] },
+            { name: 'Advanced', price: '$200', items: ['Full-body', 'Lighting detail'] },
+            { name: 'Commercial', price: 'Custom', items: ['License', 'Usage-based quote'] }
+          ],
+          workTitle: 'Portfolio',
+          workDesc: 'Click any work to enlarge.',
+          rulesTitle: 'Rules',
+          rules: [
+            { title: 'Payment', content: 'Deposit required after confirmation.' },
+            { title: 'Revisions', content: 'Sketch revisions are allowed. Major final changes cost extra.' },
+            { title: 'Commercial Use', content: 'Commercial licensing is quoted separately.' }
+          ],
+          contactTitle: 'Contact',
+          contactDesc: 'Copy the Discord ID or contact via email.',
+          discordLabel: 'Discord',
+          emailLabel: 'Email',
+          discordCopied: 'Discord ID copied',
+          commissionPanelTitle: 'Commission Channel',
+          commissionPanelBody: 'Discord is the fastest way to reach me for commission inquiries, scheduling, and project discussion.',
+          emptyGallery: 'No portfolio images found yet. Add files like work1.jpg, work2.jpg... into the images folder.'
+        }
+      };
+
+      let lang = 'zh';
+      let selected = null;
+      let pointer = { x: 0, y: 0 };
+      let currentSlide = 0;
+      let gallery = [];
+      let slideTimer = null;
+
+      function buildWorkItems(language) {
+        return Array.from({ length: MAX_WORKS }, (_, i) => {
+          const num = i + 1;
+          return {
+            category: language === 'zh' ? '角色藝術' : 'Character Art',
+            name: language === 'zh' ? `作品 ${num}` : `Artwork ${num}`,
+            blurb: language === 'zh' ? '自動載入的作品展示。' : 'Automatically loaded portfolio artwork.',
+            image: `images/work${num}.jpg`
+          };
+        });
+      }
+
+      async function loadGallery() {
+        const candidates = buildWorkItems(lang);
+
+        const checks = await Promise.all(
+          candidates.map(item => {
+            return new Promise(resolve => {
+              const img = new Image();
+              img.onload = () => resolve(item);
+              img.onerror = () => resolve(null);
+              img.src = item.image;
+            });
           })
-      )
-    ).then((results) => {
-      if (!isCancelled) {
-        const loaded = results.filter((item): item is PortfolioItem => item !== null);
-        setGallery(loaded);
+        );
+
+        gallery = checks.filter(Boolean);
+
+        if (gallery.length === 0) currentSlide = 0;
+        if (currentSlide >= gallery.length) currentSlide = 0;
       }
-    });
 
-    return () => {
-      isCancelled = true;
-    };
-  }, [lang]);
+      function restartSlider() {
+        if (slideTimer) clearInterval(slideTimer);
+        if (gallery.length <= 1) return;
+        slideTimer = setInterval(() => {
+          currentSlide = (currentSlide + 1) % gallery.length;
+          render();
+        }, 3500);
+      }
 
-  useEffect(() => {
-    if (gallery.length <= 1) return;
-    const timer = window.setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % gallery.length);
-    }, 3500);
-    return () => window.clearInterval(timer);
-  }, [gallery.length]);
+      function render() {
+        const t = content[lang];
+        const app = document.getElementById('app');
 
-  useEffect(() => {
-    if (gallery.length === 0) {
-      setCurrentSlide(0);
-      return;
-    }
-    if (currentSlide >= gallery.length) {
-      setCurrentSlide(0);
-    }
-  }, [gallery.length, currentSlide]);
-
-  const copyDiscord = async () => {
-    try {
-      await navigator.clipboard.writeText(DISCORD_ID);
-      window.alert(t.discordCopied);
-    } catch {
-      window.alert(DISCORD_ID);
-    }
-  };
-
-  return (
-    <div className="min-h-screen overflow-hidden bg-[#02040b] text-white">
-      <style>{`
-        @keyframes floatSlow {
-          0% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-          100% { transform: translateY(0px); }
-        }
-        @keyframes drift {
-          0% { transform: translateX(0px); }
-          50% { transform: translateX(30px); }
-          100% { transform: translateX(0px); }
-        }
-        @keyframes sparkle {
-          0%, 100% { opacity: 0.2; transform: scale(1); }
-          50% { opacity: 0.8; transform: scale(1.6); }
-        }
-        @keyframes beamMove {
-          0% { transform: translateX(-10%) rotate(0deg); opacity: 0.2; }
-          50% { transform: translateX(10%) rotate(1deg); opacity: 0.6; }
-          100% { transform: translateX(-10%) rotate(0deg); opacity: 0.2; }
-        }
-        @keyframes gridPulse {
-          0%, 100% { opacity: 0.15; }
-          50% { opacity: 0.35; }
-        }
-        @keyframes scanlineMove {
-          0% { transform: translateY(-100%); }
-          100% { transform: translateY(100%); }
-        }
-        @keyframes cardSweep {
-          0% { transform: translateX(-140%) skewX(-18deg); opacity: 0; }
-          20% { opacity: 0; }
-          45% { opacity: 0.55; }
-          100% { transform: translateX(180%) skewX(-18deg); opacity: 0; }
-        }
-        @keyframes cardPulse {
-          0%, 100% {
-            box-shadow: 0 18px 48px rgba(0,0,0,0.34), 0 0 0 rgba(90,170,255,0);
-          }
-          50% {
-            box-shadow: 0 18px 48px rgba(0,0,0,0.4), 0 0 28px rgba(90,170,255,0.12);
-          }
-        }
-        .bg-float { animation: floatSlow 12s ease-in-out infinite; }
-        .bg-drift { animation: drift 18s ease-in-out infinite; }
-        .beam {
-          position: absolute;
-          width: 120%;
-          height: 200px;
-          background: linear-gradient(90deg, transparent, rgba(120,180,255,0.2), transparent);
-          filter: blur(25px);
-          animation: beamMove 18s ease-in-out infinite;
-        }
-        .sparkle {
-          position: absolute;
-          width: 3px;
-          height: 3px;
-          background: rgba(180,220,255,0.9);
-          border-radius: 999px;
-          box-shadow: 0 0 10px rgba(120,180,255,0.8);
-          animation: sparkle 4s infinite ease-in-out;
-        }
-        .grid-animate { animation: gridPulse 6s ease-in-out infinite; }
-        .scanline {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(180deg, transparent, rgba(120,180,255,0.08), transparent);
-          animation: scanlineMove 6s linear infinite;
-          pointer-events: none;
-        }
-        .work-card {
-          position: relative;
-          animation: cardPulse 6s ease-in-out infinite;
-        }
-        .work-card::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          border-radius: 2rem;
-          padding: 1px;
-          background: linear-gradient(135deg, rgba(120,190,255,0.45), rgba(130,110,255,0.15), rgba(120,190,255,0.08));
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-          opacity: 0.45;
-          pointer-events: none;
-          transition: opacity 240ms ease;
-        }
-        .work-card::after {
-          content: '';
-          position: absolute;
-          top: -20%;
-          bottom: -20%;
-          width: 28%;
-          background: linear-gradient(90deg, transparent, rgba(160,220,255,0.1), rgba(255,255,255,0.32), rgba(160,220,255,0.1), transparent);
-          filter: blur(10px);
-          transform: translateX(-140%) skewX(-18deg);
-          opacity: 0;
-          pointer-events: none;
-        }
-        .work-card:hover::before { opacity: 0.85; }
-        .work-card:hover::after { animation: cardSweep 900ms ease forwards; }
-      `}</style>
-
-      <div className="pointer-events-none absolute inset-0">
-        <div
-          className="bg-float absolute left-[-120px] top-[-140px] h-[680px] w-[680px] rounded-full bg-cyan-400/10 blur-3xl"
-          style={{ transform: `translate(${pointer.x}px, ${pointer.y}px)` }}
-        />
-        <div
-          className="bg-drift absolute bottom-[-140px] right-[-100px] h-[560px] w-[560px] rounded-full bg-violet-500/10 blur-3xl"
-          style={{ transform: `translate(${-pointer.x * 0.7}px, ${-pointer.y * 0.7}px)` }}
-        />
-        <div className="beam left-[-10%] top-[20%]" />
-        <div className="beam bottom-[10%] left-[0%]" style={{ animationDelay: '6s' }} />
-        {Array.from({ length: 25 }).map((_, i) => (
-          <div
-            key={i}
-            className="sparkle"
-            style={{
-              top: `${(i * 17) % 100}%`,
-              left: `${(i * 31) % 100}%`,
-              animationDelay: `${(i % 5) * 0.6}s`,
-            }}
-          />
-        ))}
-        <div className="grid-animate absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(120,180,255,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(120,180,255,0.14)_1px,transparent_1px)] [background-size:70px_70px]" />
-        <div className="grid-animate absolute inset-x-0 bottom-0 h-[52%] origin-bottom opacity-70 [background-image:linear-gradient(rgba(120,180,255,0.22)_1px,transparent_1px),linear-gradient(90deg,rgba(120,180,255,0.22)_1px,transparent_1px)] [background-size:120px_120px] [transform:perspective(1200px)_rotateX(72deg)_translateY(16%)]" />
-        <div className="scanline" />
-      </div>
-
-      <section id="home" className="relative border-b border-cyan-200/10">
-        <div className="mx-auto max-w-7xl px-6 py-8 lg:px-10">
-          <header className="flex flex-col gap-5 border-b border-cyan-200/10 pb-5 md:flex-row md:items-center md:justify-between">
-            <a href="#home" className="flex items-center gap-4">
-              <div className="rounded-sm border border-cyan-200/30 bg-white/5 p-1 shadow-[0_0_20px_rgba(100,180,255,0.14)] backdrop-blur">
-                <img
-                  src={LOGO_IMAGE}
-                  alt={`${t.brand} logo`}
-                  className="h-16 w-auto rounded-[2px] object-contain md:h-20"
-                />
-              </div>
-              <div>
-                <div className="text-4xl font-light tracking-wide text-white md:text-5xl">{t.brand}</div>
-                <div className="mt-1 text-lg text-cyan-50/75">{t.brandSub}</div>
-              </div>
-            </a>
-
-            <div className="flex flex-wrap items-center gap-6 text-lg text-white/80">
-              <nav className="flex flex-wrap gap-6 text-lg text-white/80">
-                <a href="#home" className="transition hover:text-cyan-100">{t.nav.home}</a>
-                <a href="#services" className="transition hover:text-cyan-100">{t.nav.services}</a>
-                <a href="#pricing" className="transition hover:text-cyan-100">{t.nav.pricing}</a>
-                <a href="#work" className="transition hover:text-cyan-100">{t.nav.work}</a>
-                <a href="#rules" className="transition hover:text-cyan-100">{t.nav.rules}</a>
-                <a href="#contact" className="transition hover:text-cyan-100">{t.nav.contact}</a>
-              </nav>
-              <div className="flex rounded-full border border-white/10 bg-white/5 p-1 backdrop-blur">
-                {([
-                  { key: 'zh', label: '中文' },
-                  { key: 'en', label: 'English' },
-                ] as const).map((item) => (
-                  <button
-                    key={item.key}
-                    type="button"
-                    onClick={() => setLang(item.key)}
-                    className={`rounded-full px-4 py-2 text-sm transition ${
-                      lang === item.key
-                        ? 'bg-cyan-100 text-[#07101f]'
-                        : 'text-white/70 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
+        app.innerHTML = `
+          <div class="min-h-screen overflow-hidden bg-[#02040b] text-white relative">
+            <div class="pointer-events-none absolute inset-0">
+              <div id="orb1" class="bg-float absolute left-[-120px] top-[-140px] h-[680px] w-[680px] rounded-full bg-cyan-400/10 blur-3xl"></div>
+              <div id="orb2" class="bg-drift absolute bottom-[-140px] right-[-100px] h-[560px] w-[560px] rounded-full bg-violet-500/10 blur-3xl"></div>
+              <div class="beam left-[-10%] top-[20%]"></div>
+              <div class="beam bottom-[10%] left-[0%]" style="animation-delay:6s"></div>
+              ${Array.from({ length: 25 }).map((_, i) =>
+                `<div class="sparkle" style="top:${(i * 17) % 100}%;left:${(i * 31) % 100}%;animation-delay:${(i % 5) * 0.6}s"></div>`
+              ).join('')}
+              <div class="grid-animate absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(120,180,255,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(120,180,255,0.14)_1px,transparent_1px)] [background-size:70px_70px]"></div>
+              <div class="grid-animate absolute inset-x-0 bottom-0 h-[52%] origin-bottom opacity-70 [background-image:linear-gradient(rgba(120,180,255,0.22)_1px,transparent_1px),linear-gradient(90deg,rgba(120,180,255,0.22)_1px,transparent_1px)] [background-size:120px_120px] [transform:perspective(1200px)_rotateX(72deg)_translateY(16%)]"></div>
+              <div class="scanline"></div>
             </div>
-          </header>
 
-          <div className="flex min-h-[72vh] flex-col items-center justify-center py-20 text-center lg:min-h-[78vh]">
-            <div className="max-w-5xl text-5xl font-light leading-tight tracking-tight text-white md:text-7xl lg:text-8xl">
-              <div>{t.heroLine1}</div>
-              <div className="bg-gradient-to-r from-cyan-100 via-white to-violet-200 bg-clip-text text-transparent">
-                {t.heroLine2}
-              </div>
-            </div>
-            <div className="mt-8 rounded-full border border-cyan-200/25 bg-white/5 px-10 py-4 text-xl text-white/85 shadow-[0_0_18px_rgba(70,170,255,0.08)] backdrop-blur md:text-2xl">
-              {t.openLine}
-            </div>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-              <a
-                href="#contact"
-                className="rounded-full border border-cyan-200/30 bg-gradient-to-b from-blue-500/20 to-slate-950/50 px-12 py-4 text-2xl font-medium text-cyan-50 shadow-[0_0_18px_rgba(70,170,255,0.18)] transition hover:-translate-y-0.5"
-              >
-                {t.ctaPrimary}
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+            <section id="home" class="relative border-b border-cyan-200/10">
+              <div class="mx-auto max-w-7xl px-6 py-8 lg:px-10">
+                <header class="flex flex-col gap-5 border-b border-cyan-200/10 pb-5 md:flex-row md:items-center md:justify-between">
+                  <a href="#home" class="flex items-center gap-4">
+                    <div class="rounded-sm border border-cyan-200/30 bg-white/5 p-1 shadow-[0_0_20px_rgba(100,180,255,0.14)] backdrop-blur">
+                      <img src="${LOGO_IMAGE}" alt="${t.brand} logo" class="h-16 w-auto rounded-[2px] object-contain md:h-20" />
+                    </div>
+                    <div>
+                      <div class="text-4xl font-light tracking-wide text-white md:text-5xl">${t.brand}</div>
+                      <div class="mt-1 text-lg text-cyan-50/75">${t.brandSub}</div>
+                    </div>
+                  </a>
 
-      <section id="services" className="mx-auto max-w-7xl px-6 py-20 lg:px-10">
-        <h2 className="mb-8 text-3xl font-semibold md:text-4xl">{t.servicesTitle}</h2>
-        <div className="grid gap-6 md:grid-cols-2">
-          {t.services.map((service) => (
-            <div
-              key={service.title}
-              className="rounded-[2rem] border border-white/10 bg-white/5 p-7 shadow-[0_18px_48px_rgba(0,0,0,0.34)] backdrop-blur"
-            >
-              <h3 className="text-xl font-medium">{service.title}</h3>
-              <p className="mt-4 leading-7 text-white/68">{service.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section id="pricing" className="mx-auto max-w-7xl px-6 py-20 lg:px-10">
-        <h2 className="mb-8 text-3xl font-semibold md:text-4xl">{t.pricingTitle}</h2>
-        <div className="grid gap-6 lg:grid-cols-3">
-          {t.pricingPlans.map((plan) => (
-            <div
-              key={plan.name}
-              className="rounded-[2rem] border border-white/10 bg-white/5 p-7 shadow-[0_18px_48px_rgba(0,0,0,0.34)] backdrop-blur"
-            >
-              <div className="text-sm text-white/45">{plan.name}</div>
-              <div className="mt-3 text-2xl font-semibold">{plan.price}</div>
-              <div className="mt-5 space-y-2 text-sm text-white/70">
-                {plan.items.map((item) => (
-                  <div key={item} className="rounded-lg bg-black/20 px-3 py-2">
-                    {item}
+                  <div class="flex flex-wrap items-center gap-6 text-lg text-white/80">
+                    <nav class="flex flex-wrap gap-6 text-lg text-white/80">
+                      <a href="#home" class="transition hover:text-cyan-100">${t.nav.home}</a>
+                      <a href="#services" class="transition hover:text-cyan-100">${t.nav.services}</a>
+                      <a href="#pricing" class="transition hover:text-cyan-100">${t.nav.pricing}</a>
+                      <a href="#work" class="transition hover:text-cyan-100">${t.nav.work}</a>
+                      <a href="#rules" class="transition hover:text-cyan-100">${t.nav.rules}</a>
+                      <a href="#contact" class="transition hover:text-cyan-100">${t.nav.contact}</a>
+                    </nav>
+                    <div class="flex rounded-full border border-white/10 bg-white/5 p-1 backdrop-blur">
+                      ${[
+                        { key: 'zh', label: '中文' },
+                        { key: 'en', label: 'English' }
+                      ].map(item =>
+                        `<button data-lang="${item.key}" class="lang-btn rounded-full px-4 py-2 text-sm transition ${lang === item.key ? 'bg-cyan-100 text-[#07101f]' : 'text-white/70 hover:bg-white/10 hover:text-white'}">${item.label}</button>`
+                      ).join('')}
+                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+                </header>
 
-      <section id="work" className="mx-auto max-w-7xl px-6 py-20 lg:px-10">
-        {gallery.length > 0 && (
-          <div className="mb-8 overflow-hidden rounded-[2rem] border border-cyan-200/15 bg-white/5 p-4 shadow-[0_18px_48px_rgba(0,0,0,0.34)] backdrop-blur">
-            <div className="relative overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-cyan-100/10 via-white/5 to-violet-100/10">
-              <img
-                src={gallery[currentSlide].image}
-                alt={gallery[currentSlide].name}
-                className="h-[320px] w-full object-cover object-center md:h-[420px]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-                <div className="text-sm text-cyan-100/80">{gallery[currentSlide].category}</div>
-                <div className="mt-2 text-2xl font-semibold md:text-4xl">{gallery[currentSlide].name}</div>
-                <div className="mt-3 max-w-2xl text-sm leading-7 text-white/75 md:text-base">
-                  {gallery[currentSlide].blurb}
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setCurrentSlide((prev) => (prev - 1 + gallery.length) % gallery.length)}
-                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-black/35 px-4 py-3 text-white/80 backdrop-blur transition hover:bg-white/10 hover:text-white"
-              >
-                ‹
-              </button>
-              <button
-                type="button"
-                onClick={() => setCurrentSlide((prev) => (prev + 1) % gallery.length)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-black/35 px-4 py-3 text-white/80 backdrop-blur transition hover:bg-white/10 hover:text-white"
-              >
-                ›
-              </button>
-            </div>
-            <div className="mt-4 flex items-center justify-center gap-2">
-              {gallery.map((item, idx) => (
-                <button
-                  key={`${item.name}-${idx}`}
-                  type="button"
-                  onClick={() => setCurrentSlide(idx)}
-                  className={`h-2.5 rounded-full transition ${
-                    idx === currentSlide ? 'w-8 bg-cyan-200' : 'w-2.5 bg-white/25 hover:bg-white/40'
-                  }`}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h2 className="text-3xl font-semibold md:text-4xl">{t.workTitle}</h2>
-          </div>
-          <p className="max-w-xl text-white/65">{t.workDesc}</p>
-        </div>
-
-        {gallery.length === 0 ? (
-          <div className="rounded-[2rem] border border-dashed border-white/15 bg-white/5 p-10 text-center text-white/55 backdrop-blur">
-            {t.emptyGallery}
-          </div>
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {gallery.map((project, idx) => (
-              <button
-                key={`${project.name}-${idx}`}
-                type="button"
-                className="work-card group overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 text-left shadow-[0_18px_48px_rgba(0,0,0,0.34)] backdrop-blur transition hover:-translate-y-1 hover:border-cyan-200/20 hover:bg-white/[0.07]"
-                onClick={() => setSelected(project)}
-              >
-                <div className="relative overflow-hidden bg-gradient-to-br from-cyan-100/10 via-white/5 to-violet-100/10">
-                  <img
-                    src={project.image}
-                    alt={project.name}
-                    className="h-[360px] w-full object-cover object-center transition duration-500 group-hover:scale-[1.05] group-hover:saturate-[1.08]"
-                  />
-                  <div className="absolute left-4 top-4 rounded-full border border-white/15 bg-black/35 px-3 py-1 text-xs text-white/80 backdrop-blur">
-                    {String(idx + 1).padStart(2, '0')}
+                <div class="flex min-h-[72vh] flex-col items-center justify-center py-20 text-center lg:min-h-[78vh]">
+                  <div class="max-w-5xl text-5xl font-light leading-tight tracking-tight text-white md:text-7xl lg:text-8xl">
+                    <div>${t.heroLine1}</div>
+                    <div class="bg-gradient-to-r from-cyan-100 via-white to-violet-200 bg-clip-text text-transparent">${t.heroLine2}</div>
                   </div>
-                  <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-neutral-950/80 to-transparent" />
+                  <div class="mt-8 rounded-full border border-cyan-200/25 bg-white/5 px-10 py-4 text-xl text-white/85 shadow-[0_0_18px_rgba(70,170,255,0.08)] backdrop-blur md:text-2xl">${t.openLine}</div>
+                  <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
+                    <a href="#contact" class="rounded-full border border-cyan-200/30 bg-gradient-to-b from-blue-500/20 to-slate-950/50 px-12 py-4 text-2xl font-medium text-cyan-50 shadow-[0_0_18px_rgba(70,170,255,0.18)] transition hover:-translate-y-0.5">${t.ctaPrimary}</a>
+                  </div>
                 </div>
-                <div className="p-6">
-                  <div className="text-sm text-cyan-100/75">{project.category}</div>
-                  <h3 className="mt-2 text-2xl font-medium">{project.name}</h3>
-                  <p className="mt-4 leading-7 text-white/68">{project.blurb}</p>
+              </div>
+            </section>
+
+            <section id="services" class="mx-auto max-w-7xl px-6 py-20 lg:px-10">
+              <h2 class="mb-8 text-3xl font-semibold md:text-4xl">${t.servicesTitle}</h2>
+              <div class="grid gap-6 md:grid-cols-2">
+                ${t.services.map(service => `
+                  <div class="rounded-[2rem] border border-white/10 bg-white/5 p-7 shadow-[0_18px_48px_rgba(0,0,0,0.34)] backdrop-blur">
+                    <h3 class="text-xl font-medium">${service.title}</h3>
+                    <p class="mt-4 leading-7 text-white/68">${service.desc}</p>
+                  </div>
+                `).join('')}
+              </div>
+            </section>
+
+            <section id="pricing" class="mx-auto max-w-7xl px-6 py-20 lg:px-10">
+              <h2 class="mb-8 text-3xl font-semibold md:text-4xl">${t.pricingTitle}</h2>
+              <div class="grid gap-6 lg:grid-cols-3">
+                ${t.pricingPlans.map(plan => `
+                  <div class="rounded-[2rem] border border-white/10 bg-white/5 p-7 shadow-[0_18px_48px_rgba(0,0,0,0.34)] backdrop-blur">
+                    <div class="text-sm text-white/45">${plan.name}</div>
+                    <div class="mt-3 text-2xl font-semibold">${plan.price}</div>
+                    <div class="mt-5 space-y-2 text-sm text-white/70">
+                      ${plan.items.map(item => `<div class="rounded-lg bg-black/20 px-3 py-2">${item}</div>`).join('')}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </section>
+
+            <section id="work" class="mx-auto max-w-7xl px-6 py-20 lg:px-10">
+              ${gallery.length > 0 ? `
+                <div class="mb-8 overflow-hidden rounded-[2rem] border border-cyan-200/15 bg-white/5 p-4 shadow-[0_18px_48px_rgba(0,0,0,0.34)] backdrop-blur">
+                  <div class="relative overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-cyan-100/10 via-white/5 to-violet-100/10">
+                    <img src="${gallery[currentSlide].image}" alt="${gallery[currentSlide].name}" class="h-[320px] w-full object-cover object-center md:h-[420px]" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+                      <div class="text-sm text-cyan-100/80">${gallery[currentSlide].category}</div>
+                      <div class="mt-2 text-2xl font-semibold md:text-4xl">${gallery[currentSlide].name}</div>
+                      <div class="mt-3 max-w-2xl text-sm leading-7 text-white/75 md:text-base">${gallery[currentSlide].blurb}</div>
+                    </div>
+                    <button id="prev-slide" type="button" class="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-black/35 px-4 py-3 text-white/80 backdrop-blur transition hover:bg-white/10 hover:text-white">‹</button>
+                    <button id="next-slide" type="button" class="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-black/35 px-4 py-3 text-white/80 backdrop-blur transition hover:bg-white/10 hover:text-white">›</button>
+                  </div>
+                  <div class="mt-4 flex items-center justify-center gap-2">
+                    ${gallery.map((item, idx) => `
+                      <button data-dot="${idx}" type="button" class="slide-dot h-2.5 rounded-full transition ${idx === currentSlide ? 'w-8 bg-cyan-200' : 'w-2.5 bg-white/25 hover:bg-white/40'}" aria-label="Go to slide ${idx + 1}"></button>
+                    `).join('')}
+                  </div>
                 </div>
-              </button>
-            ))}
+              ` : ''}
+
+              <div class="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                <div><h2 class="text-3xl font-semibold md:text-4xl">${t.workTitle}</h2></div>
+                <p class="max-w-xl text-white/65">${t.workDesc}</p>
+              </div>
+
+              ${gallery.length === 0 ? `
+                <div class="rounded-[2rem] border border-dashed border-white/15 bg-white/5 p-10 text-center text-white/55 backdrop-blur">
+                  ${t.emptyGallery}
+                </div>
+              ` : `
+                <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                  ${gallery.map((project, idx) => `
+                    <button data-work="${idx}" type="button" class="work-btn work-card group overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 text-left shadow-[0_18px_48px_rgba(0,0,0,0.34)] backdrop-blur transition hover:-translate-y-1 hover:border-cyan-200/20 hover:bg-white/[0.07]">
+                      <div class="relative overflow-hidden bg-gradient-to-br from-cyan-100/10 via-white/5 to-violet-100/10">
+                        <img src="${project.image}" alt="${project.name}" class="h-[360px] w-full object-cover object-center transition duration-500 group-hover:scale-[1.05] group-hover:saturate-[1.08]" />
+                        <div class="absolute left-4 top-4 rounded-full border border-white/15 bg-black/35 px-3 py-1 text-xs text-white/80 backdrop-blur">${String(idx + 1).padStart(2, '0')}</div>
+                        <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-neutral-950/80 to-transparent"></div>
+                      </div>
+                      <div class="p-6">
+                        <div class="text-sm text-cyan-100/75">${project.category}</div>
+                        <h3 class="mt-2 text-2xl font-medium">${project.name}</h3>
+                        <p class="mt-4 leading-7 text-white/68">${project.blurb}</p>
+                      </div>
+                    </button>
+                  `).join('')}
+                </div>
+              `}
+            </section>
+
+            <section id="rules" class="mx-auto max-w-7xl px-6 py-20 lg:px-10">
+              <h2 class="mb-8 text-3xl font-semibold md:text-4xl">${t.rulesTitle}</h2>
+              <div class="grid gap-6 md:grid-cols-3">
+                ${t.rules.map(rule => `
+                  <div class="rounded-[1.75rem] border border-white/10 bg-white/5 p-6 shadow-[0_18px_48px_rgba(0,0,0,0.34)] backdrop-blur">
+                    <h3 class="text-lg font-medium">${rule.title}</h3>
+                    <p class="mt-3 leading-7 text-white/70">${rule.content}</p>
+                  </div>
+                `).join('')}
+              </div>
+            </section>
+
+            <section id="contact" class="mx-auto max-w-7xl px-6 py-20 lg:px-10">
+              <div class="grid gap-8 rounded-[2.25rem] border border-white/10 bg-white/5 p-8 shadow-[0_18px_48px_rgba(0,0,0,0.34)] backdrop-blur lg:grid-cols-[0.9fr_1.1fr] lg:p-10">
+                <div>
+                  <h2 class="text-3xl font-semibold md:text-4xl">${t.contactTitle}</h2>
+                  <p class="mt-5 max-w-md leading-7 text-white/65">${t.contactDesc}</p>
+                  <div class="mt-8 grid gap-3">
+                    <button id="copy-discord" type="button" class="rounded-2xl border border-white/10 bg-black/15 px-4 py-4 text-left text-white/80 transition hover:bg-white/10">${t.discordLabel}: ${DISCORD_ID}</button>
+                    <a href="mailto:${EMAIL_ADDRESS}" class="rounded-2xl border border-white/10 bg-black/15 px-4 py-4 text-white/80 transition hover:bg-white/10">${t.emailLabel}: ${EMAIL_ADDRESS}</a>
+                  </div>
+                </div>
+                <div class="rounded-[1.75rem] border border-cyan-200/10 bg-gradient-to-br from-cyan-200/8 via-white/3 to-violet-200/8 p-6">
+                  <div class="text-sm uppercase tracking-[0.3em] text-white/45">ArtEMIS</div>
+                  <div class="mt-4 text-2xl font-semibold">${t.commissionPanelTitle}</div>
+                  <p class="mt-4 leading-7 text-white/65">${t.commissionPanelBody}</p>
+                </div>
+              </div>
+            </section>
+
+            <footer class="border-t border-white/10 px-6 py-8 text-center text-sm text-white/45">
+              ArtEMIS / 米絲藝術
+            </footer>
+
+            ${selected ? `
+              <div id="lightbox" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur">
+                <div class="relative w-full max-w-4xl p-6">
+                  <img src="${selected.image}" alt="${selected.name}" class="w-full max-h-[80vh] rounded-2xl object-contain shadow-2xl" />
+                  <button id="close-lightbox" type="button" class="absolute right-2 top-2 text-2xl text-white/70 hover:text-white">✕</button>
+                </div>
+              </div>
+            ` : ''}
           </div>
-        )}
-      </section>
+        `;
 
-      <section id="rules" className="mx-auto max-w-7xl px-6 py-20 lg:px-10">
-        <h2 className="mb-8 text-3xl font-semibold md:text-4xl">{t.rulesTitle}</h2>
-        <div className="grid gap-6 md:grid-cols-3">
-          {t.rules.map((rule) => (
-            <div
-              key={rule.title}
-              className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6 shadow-[0_18px_48px_rgba(0,0,0,0.34)] backdrop-blur"
-            >
-              <h3 className="text-lg font-medium">{rule.title}</h3>
-              <p className="mt-3 leading-7 text-white/70">{rule.content}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+        const orb1 = document.getElementById('orb1');
+        const orb2 = document.getElementById('orb2');
+        if (orb1) orb1.style.transform = `translate(${pointer.x}px, ${pointer.y}px)`;
+        if (orb2) orb2.style.transform = `translate(${-pointer.x * 0.7}px, ${-pointer.y * 0.7}px)`;
 
-      <section id="contact" className="mx-auto max-w-7xl px-6 py-20 lg:px-10">
-        <div className="grid gap-8 rounded-[2.25rem] border border-white/10 bg-white/5 p-8 shadow-[0_18px_48px_rgba(0,0,0,0.34)] backdrop-blur lg:grid-cols-[0.9fr_1.1fr] lg:p-10">
-          <div>
-            <h2 className="text-3xl font-semibold md:text-4xl">{t.contactTitle}</h2>
-            <p className="mt-5 max-w-md leading-7 text-white/65">{t.contactDesc}</p>
-            <div className="mt-8 grid gap-3">
-              <button
-                type="button"
-                onClick={copyDiscord}
-                className="rounded-2xl border border-white/10 bg-black/15 px-4 py-4 text-left text-white/80 transition hover:bg-white/10"
-              >
-                {t.discordLabel}: {DISCORD_ID}
-              </button>
-              <a
-                href={`mailto:${EMAIL_ADDRESS}`}
-                className="rounded-2xl border border-white/10 bg-black/15 px-4 py-4 text-white/80 transition hover:bg-white/10"
-              >
-                {t.emailLabel}: {EMAIL_ADDRESS}
-              </a>
-            </div>
-          </div>
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            lang = btn.dataset.lang;
+            selected = null;
+            document.documentElement.lang = lang === 'zh' ? 'zh-Hant' : 'en';
+            await loadGallery();
+            restartSlider();
+            render();
+          });
+        });
 
-          <div className="rounded-[1.75rem] border border-cyan-200/10 bg-gradient-to-br from-cyan-200/8 via-white/3 to-violet-200/8 p-6">
-            <div className="text-sm uppercase tracking-[0.3em] text-white/45">ArtEMIS</div>
-            <div className="mt-4 text-2xl font-semibold">{t.commissionPanelTitle}</div>
-            <p className="mt-4 leading-7 text-white/65">{t.commissionPanelBody}</p>
-          </div>
-        </div>
-      </section>
+        document.querySelectorAll('.work-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            selected = gallery[Number(btn.dataset.work)];
+            render();
+          });
+        });
 
-      <footer className="border-t border-white/10 px-6 py-8 text-center text-sm text-white/45">
-        ArtEMIS / 米絲藝術
-      </footer>
+        document.querySelectorAll('.slide-dot').forEach(btn => {
+          btn.addEventListener('click', () => {
+            currentSlide = Number(btn.dataset.dot);
+            restartSlider();
+            render();
+          });
+        });
 
-      {selected && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur"
-          onClick={() => setSelected(null)}
-        >
-          <div className="relative w-full max-w-4xl p-6" onClick={(e) => e.stopPropagation()}>
-            <img
-              src={selected.image}
-              alt={selected.name}
-              className="w-full max-h-[80vh] rounded-2xl object-contain shadow-2xl"
-            />
-            <button
-              type="button"
-              onClick={() => setSelected(null)}
-              className="absolute right-2 top-2 text-2xl text-white/70 hover:text-white"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+        const prev = document.getElementById('prev-slide');
+        if (prev) {
+          prev.addEventListener('click', () => {
+            currentSlide = (currentSlide - 1 + gallery.length) % gallery.length;
+            restartSlider();
+            render();
+          });
+        }
 
-export const __tests = {
-  langs: Object.keys(content),
-  hasOnlyTwoLangs: Object.keys(content).length === 2,
-  hasNoJapanese: !('ja' in content),
-  hasDiscord: DISCORD_ID.length > 0,
-  hasLogoImage: LOGO_IMAGE === 'images/logo.png',
-  maxWorks: MAX_WORKS,
-  sampleWorkPath: buildWorkItems('zh')[0].image,
-  hasAutoRotationSupport: true,
-};
+        const next = document.getElementById('next-slide');
+        if (next) {
+          next.addEventListener('click', () => {
+            currentSlide = (currentSlide + 1) % gallery.length;
+            restartSlider();
+            render();
+          });
+        }
+
+        const copyBtn = document.getElementById('copy-discord');
+        if (copyBtn) {
+          copyBtn.addEventListener('click', async () => {
+            try {
+              await navigator.clipboard.writeText(DISCORD_ID);
+              alert(t.discordCopied);
+            } catch {
+              alert(DISCORD_ID);
+            }
+          });
+        }
+
+        const lightbox = document.getElementById('lightbox');
+        if (lightbox) {
+          lightbox.addEventListener('click', () => {
+            selected = null;
+            render();
+          });
+          const panel = lightbox.querySelector('.relative');
+          if (panel) panel.addEventListener('click', e => e.stopPropagation());
+          const close = document.getElementById('close-lightbox');
+          if (close) {
+            close.addEventListener('click', () => {
+              selected = null;
+              render();
+            });
+          }
+        }
+      }
+
+      window.addEventListener('mousemove', e => {
+        pointer = {
+          x: (e.clientX / window.innerWidth - 0.5) * 24,
+          y: (e.clientY / window.innerHeight - 0.5) * 24
+        };
+        const orb1 = document.getElementById('orb1');
+        const orb2 = document.getElementById('orb2');
+        if (orb1) orb1.style.transform = `translate(${pointer.x}px, ${pointer.y}px)`;
+        if (orb2) orb2.style.transform = `translate(${-pointer.x * 0.7}px, ${-pointer.y * 0.7}px)`;
+      });
+
+      window.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && selected) {
+          selected = null;
+          render();
+        }
+      });
+
+      (async function init() {
+        await loadGallery();
+        restartSlider();
+        render();
+      })();
+    </script>
+  </body>
+</html>
