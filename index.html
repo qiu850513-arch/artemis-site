@@ -2,164 +2,740 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ArtEMIS / 米絲藝術</title>
+  <meta
+    name="description"
+    content="ArtEMIS 米絲藝術｜角色藝術、委託插畫、作品集展示。"
+  />
+  <meta property="og:title" content="ArtEMIS / 米絲藝術" />
+  <meta property="og:description" content="Character illustration commissions and portfolio." />
+  <meta property="og:type" content="website" />
 
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
+    :root {
+      --bg: #040611;
+      --bg2: #090a1f;
+      --cyan: rgba(92, 225, 255, 0.95);
+      --blue: rgba(77, 108, 255, 0.95);
+      --pink: rgba(255, 72, 182, 0.95);
+      --line: rgba(255,255,255,0.08);
+      --text: rgba(255,255,255,0.94);
+      --muted: rgba(255,255,255,0.66);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
-      background: #02040b;
-      color: white;
-      font-family: system-ui;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(54, 91, 255, 0.24), transparent 30%),
+        radial-gradient(circle at 80% 18%, rgba(255, 32, 130, 0.22), transparent 28%),
+        radial-gradient(circle at 50% 70%, rgba(90, 215, 255, 0.12), transparent 28%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
       overflow-x: hidden;
     }
 
-    /* 🌌 背景粒子 */
-    .bg-grid {
+    .site-shell {
+      position: relative;
+      isolation: isolate;
+      min-height: 100vh;
+    }
+
+    .fx-layer {
+      pointer-events: none;
       position: fixed;
       inset: 0;
-      background:
-        linear-gradient(rgba(100,180,255,0.1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(100,180,255,0.1) 1px, transparent 1px);
-      background-size: 60px 60px;
-      opacity: 0.15;
+      z-index: -1;
+      overflow: hidden;
     }
 
     .glow {
-      position: fixed;
-      width: 800px;
-      height: 800px;
-      background: radial-gradient(circle, rgba(120,200,255,0.15), transparent 70%);
-      filter: blur(80px);
-      top: -200px;
-      left: -200px;
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(60px);
+      opacity: 0.55;
+      animation: drift 14s ease-in-out infinite;
     }
 
-    .glow2 {
-      position: fixed;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(200,120,255,0.15), transparent 70%);
-      bottom: -200px;
-      right: -200px;
-      filter: blur(80px);
+    .glow.one {
+      width: 38rem;
+      height: 38rem;
+      left: -10rem;
+      top: -8rem;
+      background: radial-gradient(circle, rgba(49, 93, 255, 0.38), transparent 65%);
     }
 
-    .hero-title {
-      font-size: clamp(40px, 6vw, 80px);
-      font-weight: 600;
-      letter-spacing: 2px;
+    .glow.two {
+      width: 34rem;
+      height: 34rem;
+      right: -8rem;
+      top: 2rem;
+      background: radial-gradient(circle, rgba(255, 47, 156, 0.30), transparent 65%);
+      animation-delay: 2s;
     }
 
-    .card {
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 20px;
+    .glow.three {
+      width: 32rem;
+      height: 32rem;
+      left: 30%;
+      bottom: -12rem;
+      background: radial-gradient(circle, rgba(92, 225, 255, 0.22), transparent 65%);
+      animation-delay: 4s;
+    }
+
+    .grid-floor,
+    .grid-sky {
+      position: absolute;
+      inset: 0;
+      opacity: 0.18;
+    }
+
+    .grid-sky {
+      background-image:
+        linear-gradient(rgba(109, 176, 255, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(109, 176, 255, 0.12) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(180deg, rgba(255,255,255,0.55), transparent 80%);
+    }
+
+    .grid-floor {
+      top: 52%;
+      height: 58%;
+      background-image:
+        linear-gradient(rgba(109, 176, 255, 0.15) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(109, 176, 255, 0.15) 1px, transparent 1px);
+      background-size: 90px 90px;
+      transform: perspective(1000px) rotateX(76deg);
+      transform-origin: top center;
+      mask-image: linear-gradient(180deg, rgba(255,255,255,0.8), transparent 85%);
+    }
+
+    svg.network {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.55;
+      filter: drop-shadow(0 0 10px rgba(107, 180, 255, 0.15));
+    }
+
+    .beam {
+      position: absolute;
+      width: 130%;
+      height: 160px;
+      left: -15%;
+      background: linear-gradient(90deg, transparent, rgba(105, 183, 255, 0.18), transparent);
+      filter: blur(28px);
+      animation: beamMove 15s ease-in-out infinite;
+    }
+
+    .beam.one {
+      top: 18%;
+    }
+
+    .beam.two {
+      top: 48%;
+      animation-delay: 3s;
+    }
+
+    .noise-dots {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.22) 1px, transparent 1px);
+      background-size: 28px 28px;
+      opacity: 0.08;
+      mask-image: linear-gradient(180deg, rgba(255,255,255,0.5), transparent 75%);
+    }
+
+    .container-wrap {
+      width: min(1200px, calc(100% - 2rem));
+      margin: 0 auto;
+    }
+
+    .glass-nav {
+      backdrop-filter: blur(12px);
+      background: rgba(7, 10, 24, 0.45);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.28);
+    }
+
+    .brand-title {
+      font-size: clamp(3.1rem, 8vw, 6.5rem);
+      line-height: 0.96;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      text-shadow: 0 0 26px rgba(155, 197, 255, 0.18);
+    }
+
+    .brand-sub {
+      font-size: clamp(1.55rem, 3vw, 2.9rem);
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.92);
+    }
+
+    .hero-badge {
+      border: 1px solid rgba(124, 211, 255, 0.24);
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.02) inset,
+        0 0 24px rgba(92, 225, 255, 0.06);
+      backdrop-filter: blur(10px);
+    }
+
+    .primary-btn {
+      border: 1px solid rgba(123, 230, 255, 0.35);
+      background: linear-gradient(135deg, rgba(38, 205, 255, 0.28), rgba(106, 79, 255, 0.22));
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.04) inset,
+        0 0 30px rgba(92, 225, 255, 0.16);
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.05) inset,
+        0 0 38px rgba(92, 225, 255, 0.24);
+      background: linear-gradient(135deg, rgba(38, 205, 255, 0.34), rgba(128, 85, 255, 0.24));
+    }
+
+    .section-card {
+      position: relative;
       overflow: hidden;
-      transition: 0.3s;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 48px rgba(0,0,0,0.28);
     }
 
-    .card:hover {
-      transform: translateY(-6px) scale(1.02);
-      box-shadow: 0 0 30px rgba(120,200,255,0.2);
+    .section-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(90, 225, 255, 0.10), transparent 32%, transparent 68%, rgba(255, 80, 170, 0.08));
+      pointer-events: none;
+    }
+
+    .work-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 1.6rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      box-shadow: 0 18px 48px rgba(0,0,0,0.3);
+      transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+
+    .work-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(124, 211, 255, 0.24);
+      box-shadow: 0 24px 56px rgba(0,0,0,0.38), 0 0 30px rgba(92, 225, 255, 0.08);
+    }
+
+    .work-card::after {
+      content: "";
+      position: absolute;
+      top: -15%;
+      bottom: -15%;
+      width: 28%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.24), transparent);
+      filter: blur(10px);
+      transform: translateX(-150%) skewX(-18deg);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .work-card:hover::after {
+      opacity: 1;
+      animation: sweep 900ms ease forwards;
+    }
+
+    .thumb-glow {
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 6rem;
+      background: linear-gradient(180deg, transparent, rgba(0,0,0,0.58));
+    }
+
+    .mini-tag {
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(6, 10, 26, 0.45);
+      backdrop-filter: blur(8px);
+    }
+
+    .lang-switch button.active {
+      background: rgba(255,255,255,0.9);
+      color: #08111d;
+    }
+
+    .lightbox {
+      background: rgba(1, 4, 12, 0.78);
+      backdrop-filter: blur(12px);
+    }
+
+    .empty-box {
+      border: 1px dashed rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(10px);
+    }
+
+    @keyframes drift {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(10px, -16px, 0) scale(1.05); }
+    }
+
+    @keyframes beamMove {
+      0%, 100% { transform: translateX(-2%) rotate(0deg); opacity: 0.18; }
+      50% { transform: translateX(2%) rotate(1deg); opacity: 0.38; }
+    }
+
+    @keyframes sweep {
+      0% { transform: translateX(-150%) skewX(-18deg); }
+      100% { transform: translateX(420%) skewX(-18deg); }
+    }
+
+    @media (max-width: 768px) {
+      .container-wrap {
+        width: min(100% - 1rem, 1200px);
+      }
+
+      .grid-floor {
+        top: 60%;
+        height: 46%;
+      }
     }
   </style>
 </head>
-
 <body>
+  <div class="site-shell">
+    <div class="fx-layer">
+      <div class="glow one"></div>
+      <div class="glow two"></div>
+      <div class="glow three"></div>
 
-<div class="bg-grid"></div>
-<div class="glow"></div>
-<div class="glow2"></div>
+      <div class="grid-sky"></div>
+      <div class="grid-floor"></div>
+      <div class="beam one"></div>
+      <div class="beam two"></div>
+      <div class="noise-dots"></div>
 
-<div id="app"></div>
+      <svg class="network" viewBox="0 0 1440 1200" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="lineBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="rgba(84,192,255,0.9)" />
+            <stop offset="100%" stop-color="rgba(219,62,255,0.9)" />
+          </linearGradient>
+        </defs>
 
-<script>
-let gallery = [];
-let lang = "zh";
+        <g stroke="rgba(98,162,255,0.28)" stroke-width="1.2" fill="none">
+          <path d="M0 240 L190 140 L360 260 L510 180 L680 240" />
+          <path d="M920 90 L1110 170 L1290 120 L1440 220" />
+          <path d="M80 620 L210 520 L380 620 L530 560" />
+          <path d="M980 520 L1110 470 L1300 610 L1440 540" />
+          <path d="M210 140 L210 520" />
+          <path d="M380 260 L380 620" />
+          <path d="M1110 170 L1110 470" />
+          <path d="M1290 120 L1300 610" />
+        </g>
 
-/* 🔥 讀 gallery.json */
-async function loadGallery(){
-  const res = await fetch('gallery.json');
-  const data = await res.json();
+        <g fill="rgba(114,192,255,0.85)">
+          <circle cx="190" cy="140" r="4.5" />
+          <circle cx="360" cy="260" r="4.5" />
+          <circle cx="510" cy="180" r="4.5" />
+          <circle cx="1110" cy="170" r="4.5" />
+          <circle cx="1290" cy="120" r="4.5" />
+          <circle cx="210" cy="520" r="4.5" />
+          <circle cx="380" cy="620" r="4.5" />
+          <circle cx="1110" cy="470" r="4.5" />
+          <circle cx="1300" cy="610" r="4.5" />
+        </g>
 
-  gallery = data.map(item => ({
-    ...item,
-    name: item.name[lang],
-    category: item.category[lang],
-    blurb: item.blurb[lang]
-  }));
-}
+        <g fill="rgba(255,84,190,0.75)">
+          <circle cx="920" cy="90" r="4.5" />
+          <circle cx="980" cy="520" r="4.5" />
+          <circle cx="1440" cy="220" r="4.5" />
+          <circle cx="1440" cy="540" r="4.5" />
+          <circle cx="80" cy="620" r="4.5" />
+        </g>
+      </svg>
+    </div>
 
-/* 🎨 主畫面 */
-function render(){
-  const app = document.getElementById("app");
+    <div id="app"></div>
+  </div>
 
-  app.innerHTML = `
-  <div class="max-w-7xl mx-auto px-6">
+  <script>
+    const DISCORD_ID = 'nagi.0.5.1.3';
+    const EMAIL_ADDRESS = 'nagi0513new@gmail.com';
+    const LOGO_IMAGE = 'images/logo.png';
 
-    <!-- HERO -->
-    <section class="min-h-[80vh] flex flex-col items-center justify-center text-center">
+    const content = {
+      zh: {
+        brand: 'ArtEMIS',
+        brandSub: '米絲藝術',
+        nav: {
+          home: '首頁',
+          work: '作品',
+          pricing: '價目',
+          rules: '規則',
+          contact: '聯絡'
+        },
+        heroLine: 'Open for character illustration commissions!',
+        cta: '立即委託',
+        sectionWork: '作品展示',
+        sectionWorkDesc: '精選插畫與角色作品展示。',
+        pricing: '價目',
+        pricingPlans: [
+          { name: '基本', price: 'NT$3,000', items: ['單角色', '簡背景'] },
+          { name: '進階', price: 'NT$6,000', items: ['完整立繪', '細節光影'] },
+          { name: '商用', price: '另議', items: ['授權用途', '依需求報價'] }
+        ],
+        rulesTitle: '委託規則',
+        rules: [
+          { title: '付款', content: '確認委託後支付訂金。' },
+          { title: '修改', content: '草稿可小幅調整，完稿大改需另加費用。' },
+          { title: '商用', content: '商業用途與授權費另計。' }
+        ],
+        contactTitle: '聯絡方式',
+        contactDesc: '歡迎透過 Discord 或 Email 聯絡委託。',
+        discordLabel: 'Discord',
+        emailLabel: 'Email',
+        discordCopied: 'Discord ID 已複製',
+        emptyGallery: '目前尚未載入任何作品。請確認 gallery.json 與圖片路徑是否正確。'
+      },
+      en: {
+        brand: 'ArtEMIS',
+        brandSub: 'Misi Art',
+        nav: {
+          home: 'Home',
+          work: 'Portfolio',
+          pricing: 'Pricing',
+          rules: 'Rules',
+          contact: 'Contact'
+        },
+        heroLine: 'Open for character illustration commissions!',
+        cta: 'Commission',
+        sectionWork: 'Portfolio',
+        sectionWorkDesc: 'Selected illustrations and character artwork.',
+        pricing: 'Pricing',
+        pricingPlans: [
+          { name: 'Basic', price: '$100', items: ['Single character', 'Simple background'] },
+          { name: 'Advanced', price: '$200', items: ['Full-body art', 'Detailed lighting'] },
+          { name: 'Commercial', price: 'Custom', items: ['Usage license', 'Quoted by project'] }
+        ],
+        rulesTitle: 'Rules',
+        rules: [
+          { title: 'Payment', content: 'A deposit is required after confirmation.' },
+          { title: 'Revisions', content: 'Minor sketch revisions are allowed. Major final changes cost extra.' },
+          { title: 'Commercial Use', content: 'Commercial use and licensing are quoted separately.' }
+        ],
+        contactTitle: 'Contact',
+        contactDesc: 'Reach out through Discord or email for commissions.',
+        discordLabel: 'Discord',
+        emailLabel: 'Email',
+        discordCopied: 'Discord ID copied',
+        emptyGallery: 'No artworks loaded yet. Please check gallery.json and your image paths.'
+      }
+    };
 
-      <div class="hero-title">ArtEMIS</div>
-      <div class="text-xl text-white/70 mt-2">米絲藝術</div>
+    let lang = 'zh';
+    let gallery = [];
+    let selectedIndex = null;
 
-      <div class="mt-6 text-white/80 text-lg">
-        Open for character illustration commissions!
-      </div>
+    async function loadGallery() {
+      try {
+        const res = await fetch('./gallery.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error('gallery.json not found');
 
-      <a href="#contact" 
-         class="mt-8 px-10 py-4 rounded-full bg-cyan-400/20 border border-cyan-200/40 hover:bg-cyan-300/30 transition">
-        立即委託
-      </a>
+        const data = await res.json();
 
-    </section>
+        gallery = data.map((item, idx) => ({
+          id: item.id ?? idx + 1,
+          image: item.image,
+          category: typeof item.category === 'object' ? (item.category[lang] || item.category.zh || item.category.en || '') : (item.category || ''),
+          name: typeof item.name === 'object' ? (item.name[lang] || item.name.zh || item.name.en || '') : (item.name || ''),
+          blurb: typeof item.blurb === 'object' ? (item.blurb[lang] || item.blurb.zh || item.blurb.en || '') : (item.blurb || ''),
+          featured: Boolean(item.featured),
+          raw: item
+        }));
 
-    <!-- 🎨 作品 -->
-    <section id="work" class="py-16">
+        if (selectedIndex !== null && selectedIndex >= gallery.length) {
+          selectedIndex = null;
+        }
+      } catch (error) {
+        console.error(error);
+        gallery = [];
+      }
+    }
 
-      <h2 class="text-3xl mb-10">作品展示</h2>
+    function copyDiscord(text) {
+      navigator.clipboard.writeText(text)
+        .then(() => alert(content[lang].discordCopied))
+        .catch(() => alert(text));
+    }
 
-      <div class="grid md:grid-cols-3 gap-6">
+    function render() {
+      const t = content[lang];
+      const app = document.getElementById('app');
 
-        ${gallery.map(item => `
-          <div class="card">
-            <img src="${item.image}" class="w-full h-[300px] object-cover"/>
-            <div class="p-4">
-              <div class="text-sm text-cyan-200">${item.category}</div>
-              <div class="text-xl mt-2">${item.name}</div>
-              <div class="text-sm text-white/60 mt-2">${item.blurb}</div>
+      app.innerHTML = `
+        <header class="sticky top-0 z-40">
+          <div class="container-wrap pt-4">
+            <div class="glass-nav rounded-2xl px-4 py-3 md:px-6 md:py-4">
+              <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div class="flex items-center gap-4">
+                  <a href="#home" class="flex items-center gap-3 no-underline text-white">
+                    <img
+                      src="${LOGO_IMAGE}"
+                      alt="${t.brand}"
+                      class="h-12 w-12 rounded-full object-cover border border-white/10 bg-white/5"
+                      onerror="this.style.display='none'"
+                    />
+                    <div>
+                      <div class="text-lg font-semibold">${t.brand}</div>
+                      <div class="text-xs text-white/55 tracking-[0.25em]">${t.brandSub}</div>
+                    </div>
+                  </a>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3 md:gap-5 text-sm md:text-base">
+                  <nav class="flex flex-wrap items-center gap-4 text-white/70">
+                    <a href="#home" class="hover:text-white transition">${t.nav.home}</a>
+                    <a href="#work" class="hover:text-white transition">${t.nav.work}</a>
+                    <a href="#pricing" class="hover:text-white transition">${t.nav.pricing}</a>
+                    <a href="#rules" class="hover:text-white transition">${t.nav.rules}</a>
+                    <a href="#contact" class="hover:text-white transition">${t.nav.contact}</a>
+                  </nav>
+
+                  <div class="lang-switch flex rounded-full border border-white/10 bg-white/5 p-1">
+                    <button data-lang="zh" class="lang-btn ${lang === 'zh' ? 'active' : ''} rounded-full px-3 py-1.5 text-sm transition">中文</button>
+                    <button data-lang="en" class="lang-btn ${lang === 'en' ? 'active' : ''} rounded-full px-3 py-1.5 text-sm transition">EN</button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        `).join('')}
+        </header>
 
-      </div>
+        <main>
+          <section id="home" class="container-wrap pt-12 pb-20 md:pt-20 md:pb-28">
+            <div class="section-card rounded-[2rem] px-6 py-16 md:px-10 md:py-24 text-center">
+              <div class="mx-auto max-w-4xl">
+                <div class="brand-title">${t.brand}</div>
+                <div class="brand-sub mt-3">${t.brandSub}</div>
 
-    </section>
+                <div class="hero-badge mx-auto mt-8 inline-flex rounded-full px-6 py-3 text-sm md:text-lg text-white/85">
+                  ${t.heroLine}
+                </div>
 
-    <!-- 📩 聯絡 -->
-    <section id="contact" class="py-20 text-center">
+                <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
+                  <a
+                    href="#contact"
+                    class="primary-btn rounded-full px-8 py-4 text-base md:text-lg font-medium no-underline text-white"
+                  >
+                    ${t.cta}
+                  </a>
+                  <a
+                    href="#work"
+                    class="rounded-full border border-white/12 bg-white/5 px-8 py-4 text-base md:text-lg no-underline text-white/82 hover:bg-white/8 transition"
+                  >
+                    ${t.nav.work}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
 
-      <h2 class="text-3xl mb-6">聯絡</h2>
+          <section id="work" class="container-wrap pb-20">
+            <div class="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div>
+                <h2 class="text-3xl md:text-4xl font-semibold">${t.sectionWork}</h2>
+                <p class="mt-3 text-white/65">${t.sectionWorkDesc}</p>
+              </div>
+            </div>
 
-      <div class="space-y-4 text-white/70">
-        <div>Discord: nagi.0.5.1.3</div>
-        <div>Email: nagi0513new@gmail.com</div>
-      </div>
+            ${
+              gallery.length === 0
+                ? `
+                  <div class="empty-box rounded-[1.75rem] p-10 text-center text-white/60">
+                    ${t.emptyGallery}
+                  </div>
+                `
+                : `
+                  <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                    ${gallery.map((item, index) => `
+                      <button class="work-btn work-card text-left" data-index="${index}" type="button">
+                        <div class="relative overflow-hidden">
+                          <img
+                            src="${item.image}"
+                            alt="${item.name}"
+                            class="h-[360px] w-full object-cover object-center"
+                          />
+                          <div class="thumb-glow"></div>
+                          <div class="mini-tag absolute left-4 top-4 rounded-full px-3 py-1 text-xs text-white/85">
+                            ${String(index + 1).padStart(2, '0')}
+                          </div>
+                        </div>
+                        <div class="p-5">
+                          <div class="text-sm text-cyan-100/80">${item.category}</div>
+                          <h3 class="mt-2 text-2xl font-medium">${item.name}</h3>
+                          <p class="mt-3 text-white/65 leading-7">${item.blurb}</p>
+                        </div>
+                      </button>
+                    `).join('')}
+                  </div>
+                `
+            }
+          </section>
 
-    </section>
+          <section id="pricing" class="container-wrap pb-20">
+            <div class="mb-8">
+              <h2 class="text-3xl md:text-4xl font-semibold">${t.pricing}</h2>
+            </div>
 
-  </div>
-  `;
-}
+            <div class="grid gap-6 lg:grid-cols-3">
+              ${t.pricingPlans.map(plan => `
+                <div class="section-card rounded-[1.75rem] p-6">
+                  <div class="text-sm text-white/50">${plan.name}</div>
+                  <div class="mt-3 text-2xl font-semibold">${plan.price}</div>
+                  <div class="mt-5 space-y-2 text-sm text-white/72">
+                    ${plan.items.map(item => `
+                      <div class="rounded-xl border border-white/8 bg-black/15 px-3 py-2">${item}</div>
+                    `).join('')}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </section>
 
-/* 初始化 */
-(async function(){
-  await loadGallery();
-  render();
-})();
-</script>
+          <section id="rules" class="container-wrap pb-20">
+            <div class="mb-8">
+              <h2 class="text-3xl md:text-4xl font-semibold">${t.rulesTitle}</h2>
+            </div>
 
+            <div class="grid gap-6 md:grid-cols-3">
+              ${t.rules.map(rule => `
+                <div class="section-card rounded-[1.75rem] p-6">
+                  <h3 class="text-lg font-medium">${rule.title}</h3>
+                  <p class="mt-3 leading-7 text-white/68">${rule.content}</p>
+                </div>
+              `).join('')}
+            </div>
+          </section>
+
+          <section id="contact" class="container-wrap pb-24">
+            <div class="section-card rounded-[2rem] p-8 md:p-10">
+              <div class="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+                <div>
+                  <h2 class="text-3xl md:text-4xl font-semibold">${t.contactTitle}</h2>
+                  <p class="mt-4 max-w-md text-white/65 leading-7">${t.contactDesc}</p>
+                </div>
+
+                <div class="grid gap-3">
+                  <button id="copy-discord" type="button" class="rounded-2xl border border-white/10 bg-black/15 px-5 py-4 text-left text-white/82 hover:bg-white/8 transition">
+                    ${t.discordLabel}: ${DISCORD_ID}
+                  </button>
+                  <a href="mailto:${EMAIL_ADDRESS}" class="rounded-2xl border border-white/10 bg-black/15 px-5 py-4 text-white/82 hover:bg-white/8 transition no-underline">
+                    ${t.emailLabel}: ${EMAIL_ADDRESS}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <footer class="container-wrap pb-10 text-center text-sm text-white/40">
+          ArtEMIS / 米絲藝術
+        </footer>
+
+        ${
+          selectedIndex !== null && gallery[selectedIndex]
+            ? `
+              <div id="lightbox" class="lightbox fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div class="relative w-full max-w-5xl">
+                  <img
+                    src="${gallery[selectedIndex].image}"
+                    alt="${gallery[selectedIndex].name}"
+                    class="max-h-[85vh] w-full rounded-[1.75rem] object-contain border border-white/10 bg-black/35 shadow-2xl"
+                  />
+                  <button
+                    id="close-lightbox"
+                    type="button"
+                    class="absolute right-3 top-3 rounded-full border border-white/10 bg-black/45 px-4 py-2 text-white/75 hover:text-white"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            `
+            : ''
+        }
+      `;
+
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          lang = btn.dataset.lang;
+          document.documentElement.lang = lang === 'zh' ? 'zh-Hant' : 'en';
+          await loadGallery();
+          render();
+        });
+      });
+
+      document.querySelectorAll('.work-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedIndex = Number(btn.dataset.index);
+          render();
+        });
+      });
+
+      const copyBtn = document.getElementById('copy-discord');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', () => copyDiscord(DISCORD_ID));
+      }
+
+      const lightbox = document.getElementById('lightbox');
+      if (lightbox) {
+        lightbox.addEventListener('click', () => {
+          selectedIndex = null;
+          render();
+        });
+
+        const closeBtn = document.getElementById('close-lightbox');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectedIndex = null;
+            render();
+          });
+        }
+      }
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && selectedIndex !== null) {
+        selectedIndex = null;
+        render();
+      }
+    });
+
+    (async function init() {
+      await loadGallery();
+      render();
+    })();
+  </script>
 </body>
 </html>
